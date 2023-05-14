@@ -48,3 +48,42 @@ class AssertTypeException(ExcelException):
 
     def __str__(self):
         return self.info
+
+
+class AssertNumNotMatchException(ExcelException):
+    """
+    校验类型、字段、预期结果数量不匹配
+    """
+
+    def __init__(self, info):
+        super().__init__(self)
+        self.info = info
+
+    def __str__(self):
+        return self.info
+
+
+class MyMysqlException(Exception):
+    """
+    mysql异常
+    """
+
+    def __init__(self, info):
+        super().__init__(self)
+        self.info = info
+
+    def __str__(self):
+        return self.info
+
+
+class MyMysqlConnException(MyMysqlException):
+    """
+    mysql异常
+    """
+
+    def __init__(self, info):
+        super().__init__(self)
+        self.info = info
+
+    def __str__(self):
+        return self.info

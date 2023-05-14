@@ -20,10 +20,10 @@ def log_decorator(switch: bool):
             if switch:
                 _log_msg = f"\n请求路径: {res.request.url}\n" \
                            f"请求方式: {res.request.method}\n" \
-                           f"请求头:   {res.request.headers}\n" \
-                           f"请求内容: {res.request.body}\n" \
-                           f"接口响应内容: {res.text}\n" \
-                           f"Http状态码: {res.status_code}\n"
+                           f"请求头: {res.request.headers}\n" \
+                           f"请求体: {res.request.body}\n" \
+                           f"响应内容: {res.text}\n" \
+                           f"响应状态码: {res.status_code}"
                 if res.status_code == 200:
                     logger.info(_log_msg)
                 else:
