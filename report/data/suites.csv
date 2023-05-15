@@ -1,2 +1,2 @@
 "Status","Start Time","Stop Time","Duration in ms","Parent Suite","Suite","Sub Suite","Test Class","Test Method","Name","Description"
-"passed","Thu May 11 18:54:06 CST 2023","Thu May 11 18:54:06 CST 2023","229","utils.test_case_utils","test_single","","","","成功调佣登陆接口，msg返回登录成功","备注"
+"failed","Sun May 14 18:01:09 CST 2023","Sun May 14 18:01:09 CST 2023","152","utils.test_case_utils","test_single","","","","成功调用登陆接口，msg返回登录成功","正常用例登陆"

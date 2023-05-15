@@ -1,1 +1,22 @@
-{"72d1210fa329909b554271fb863713ff":{"statistic":{"failed":0,"broken":0,"skipped":0,"passed":1,"unknown":0,"total":1},"items":[{"uid":"4f342a3011322835","status":"passed","time":{"start":1683802446040,"stop":1683802446269,"duration":229}}]}}
+{
+  "72d1210fa329909b554271fb863713ff" : {
+    "statistic" : {
+      "failed" : 1,
+      "broken" : 0,
+      "skipped" : 0,
+      "passed" : 0,
+      "unknown" : 0,
+      "total" : 1
+    },
+    "items" : [ {
+      "uid" : "67b601218c5572e9",
+      "status" : "failed",
+      "statusDetails" : "AssertionError: 预期结果与实际结果不一致\nassert False",
+      "time" : {
+        "start" : 1684058469266,
+        "stop" : 1684058469418,
+        "duration" : 152
+      }
+    } ]
+  }
+}

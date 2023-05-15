@@ -4,17 +4,16 @@
 import os.path
 import openpyxl
 
+from config import EXCEL_FILE_PATH, TEST_SHEET_NAME
 from utils.my_exception.all_exception import *
-
-excel_path = r"D:\code\pythonProject\interFrame\excel\api_cases.xlsx"
 
 
 # 读取excel内容，实现文件驱动自动化执行
 def read_excel():
-    if not os.path.exists(excel_path):
-        raise PathNotExist("路径: %s 不存在" % excel_path)
-    excel = openpyxl.load_workbook(excel_path)
-    sheet = excel['Sheet1']
+    if not os.path.exists(EXCEL_FILE_PATH):
+        raise PathNotExist("路径: %s 不存在" % EXCEL_FILE_PATH)
+    excel = openpyxl.load_workbook(EXCEL_FILE_PATH)
+    sheet = excel[TEST_SHEET_NAME]
     title = []
     # 创建装载Excel数据的变量
     tuple_list = []
@@ -40,4 +39,14 @@ def read_excel():
 
 
 if __name__ == '__main__':
-    print(read_excel())
+    a = read_excel()[1]["预期结果"].split(";")
+    print(a)
+    b = []
+    for i in a:
+        if i.startswith("{") or i.startswith("["):
+            b.append(eval(i))
+        else:
+            b.append(i)
+
+    print(b)
+
