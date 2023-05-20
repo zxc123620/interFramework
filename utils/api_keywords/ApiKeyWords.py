@@ -1,11 +1,14 @@
 import json
 import logging
+import os
 
 import allure
 import jsonpath
 import requests
 
+from config import ROOT_PATH, EXCEL_FILE_PATH
 from utils.log_utils.log_decorate import log_decorator
+from utils.my_exception.all_exception import PathNotExist
 
 logger = logging.getLogger("main.apiKeyword")
 
@@ -15,7 +18,6 @@ class ApiKeyword:
     1、发送请求(目前只支持get、post）、获取响应结果
     2、json提取
     """
-
     @staticmethod
     @allure.step("发送get请求")
     @log_decorator(True)
@@ -31,7 +33,9 @@ class ApiKeyword:
             响应结果
 
         """
-        return requests.get(url, params=params, verify=False, **kwargs)
+        res = requests.get(url, params=params, verify=False, **kwargs)
+        # if res.status_code == requests.codes.ok:
+        return res
 
     @staticmethod
     @allure.step("发送post请求")

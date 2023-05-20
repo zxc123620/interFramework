@@ -4,16 +4,22 @@
 import os.path
 import openpyxl
 
-from config import EXCEL_FILE_PATH, TEST_SHEET_NAME
+from config import EXCEL_FILE_PATH, SQL_SHEET_NAME, TEST_SHEET_NAME
+from utils.excel_utils.data_regular import regular
 from utils.my_exception.all_exception import *
 
 
 # 读取excel内容，实现文件驱动自动化执行
-def read_excel():
+def read_excel(sheet_name):
+    """
+    读取excel原始数据
+    Returns:
+
+    """
     if not os.path.exists(EXCEL_FILE_PATH):
         raise PathNotExist("路径: %s 不存在" % EXCEL_FILE_PATH)
     excel = openpyxl.load_workbook(EXCEL_FILE_PATH)
-    sheet = excel[TEST_SHEET_NAME]
+    sheet = excel[sheet_name]
     title = []
     # 创建装载Excel数据的变量
     tuple_list = []
@@ -38,15 +44,22 @@ def read_excel():
     return dict_list
 
 
+def regular_excel_data(data: dict):
+    """
+    对原始数据进行格式化操作,对数据中的变量进行赋值,对数据中的函数进行调用
+    Returns:
+        与原始数据一致的内容
+    """
+    return regular(data)
+
+
+#
 if __name__ == '__main__':
-    a = read_excel()[1]["预期结果"].split(";")
-    print(a)
-    b = []
-    for i in a:
-        if i.startswith("{") or i.startswith("["):
-            b.append(eval(i))
+    # print(get_excel_data())
+    sql_expected_list = []
+    for i in read_excel(TEST_SHEET_NAME)[0]["数据库预期"].split(";"):
+        if i.startswith("{") or i.startswith("[") or i == "None":
+            sql_expected_list.append(eval(i))
         else:
-            b.append(i)
-
-    print(b)
-
+            sql_expected_list.append(i)
+    print(sql_expected_list)

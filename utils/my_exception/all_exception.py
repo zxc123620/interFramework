@@ -87,3 +87,16 @@ class MyMysqlConnException(MyMysqlException):
 
     def __str__(self):
         return self.info
+
+
+class MyMysqlResultNotMatchException(MyMysqlException):
+    """
+    mysql结果字典与需要用到的变量不匹配异常
+    """
+
+    def __init__(self, info):
+        super().__init__(self)
+        self.info = info
+
+    def __str__(self):
+        return self.info

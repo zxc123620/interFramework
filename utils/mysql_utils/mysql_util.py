@@ -3,19 +3,21 @@ import logging
 from dbutils.pooled_db import PooledDB
 import pymysql.cursors
 
+from config import MYSQL_HOST, MYSQL_port, MYSQL_USERNAME, MYSQL_PASSWORD, MYSQL_DB
 from utils.my_exception.all_exception import MyMysqlConnException
 import utils.log_utils.log_config
+
 logger = logging.getLogger("main.mysql")
 
 
 class MysqlPool:
     config = {
         'creator': pymysql,
-        'host': "shop-xo.hctestedu.com",
-        'port': 3306,
-        'user': "api_test",
-        'password': "Aa9999!",
-        'db': "shopxo_hctested",
+        'host': MYSQL_HOST,
+        'port': MYSQL_port,
+        'user': MYSQL_USERNAME,
+        'password': MYSQL_PASSWORD,
+        'db': MYSQL_DB,
         'charset': "utf8",
         'maxconnections': 10,  # 连接池最大连接数量
         'cursorclass': pymysql.cursors.DictCursor
@@ -46,5 +48,5 @@ if __name__ == '__main__':
             charset='utf8')
     """
     with MysqlPool() as db:
-        db.cursor.execute("select id from sxo_goods")
-        print(list(db.cursor.fetchone().values()))
+        db.cursor.execute("select id as 'myId' from sxo_goods")
+        print(db.cursor.fetchone())
