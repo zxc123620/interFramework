@@ -8,20 +8,21 @@ import requests
 
 from config import ROOT_PATH, EXCEL_FILE_PATH
 from utils.log_utils.log_decorate import log_decorator
-from utils.my_exception.all_exception import PathNotExist
 
 logger = logging.getLogger("main.apiKeyword")
 
 
 class ApiKeyword:
+    session = requests.Session()
+
     """
     1、发送请求(目前只支持get、post）、获取响应结果
     2、json提取
     """
-    @staticmethod
+
     @allure.step("发送get请求")
     @log_decorator(True)
-    def get(url, params=None, **kwargs):
+    def get(self, url, params=None, **kwargs):
         """
         发送get请求
         Args:
@@ -33,14 +34,13 @@ class ApiKeyword:
             响应结果
 
         """
-        res = requests.get(url, params=params, verify=False, **kwargs)
+        res = self.session.get(url, params=params, verify=False, **kwargs)
         # if res.status_code == requests.codes.ok:
         return res
 
-    @staticmethod
     @allure.step("发送post请求")
     @log_decorator(True)
-    def post(url, data=None, json=None, **kwargs):
+    def post(self, url, data=None, json=None, **kwargs):
         """
         发送post请求
         Args:
@@ -52,7 +52,7 @@ class ApiKeyword:
         Returns:
 
         """
-        return requests.post(url, data=data, json=json, verify=False, **kwargs)
+        return self.session.post(url, data=data, json=json, verify=False, **kwargs)
 
     @staticmethod
     @allure.step("json提取")
@@ -70,3 +70,8 @@ class ApiKeyword:
         if res:
             return res if multiple else res[0]
         return res
+
+
+if __name__ == '__main__':
+    a = ApiKeyword()
+    print(getattr(a, "get")(url="http://www.baidu.com"))

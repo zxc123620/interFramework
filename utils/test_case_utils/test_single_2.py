@@ -8,7 +8,7 @@ import pytest
 import os
 import requests
 
-from config import ROOT_PATH, ALL_VALUE, DATA_SET_NAME
+from config import ROOT_PATH, DATA_SET_NAME, set_all_value, get_all_value
 from utils.api_keywords.ApiKeyWords import ApiKeyword
 from utils.assert_utils.AssertType import AssertType, AssertMethod
 from utils.excel_utils.read_excel import read_excel, regular_excel_data
@@ -25,6 +25,7 @@ sql_sheet = excel[SQL_SHEET_NAME]
 data_set_sheet = excel[DATA_SET_NAME]
 sql_raw_data = read_excel(SQL_SHEET_NAME)
 data_set_raw_data = read_excel(DATA_SET_NAME)
+api_keyword = ApiKeyword()
 
 
 @pytest.fixture(params=read_excel(TEST_SHEET_NAME))
@@ -32,7 +33,6 @@ def set_allure_name(request):
     """
     开始执行用例,进行命名
     Args:
-        request:
     Returns:
 
     """
@@ -54,7 +54,7 @@ def set_allure_name(request):
     if request.param['级别'] is not None:
         # 动态获取级别信息(blocker、critical、normal、minor、trivial)
         allure.dynamic.severity('级别')
-    return regular_excel_data(request.param)
+    return request.param
 
 
 @pytest.fixture()
@@ -86,7 +86,7 @@ def send(case_pre_function):
 
     """
     logger.info("============发送请求============")
-    data = case_pre_function
+    data = regular_excel_data(case_pre_function)
     return data, send_request(data)
 
 
@@ -185,7 +185,7 @@ def send_request(data):
             case_sheet["S" + r] = "请求参数有误，请检查"
             raise
         # ==============发起请求==============
-        res = getattr(ApiKeyword, data['请求方法'])(**dict_data)  # 发起请求
+        res = getattr(api_keyword, data['请求方法'])(**dict_data)  # 发起请求
         if res.status_code != requests.codes.ok:  # 初步判断 200才能往下走
             case_sheet["S" + r] = "响应码不为200"
             excel.save(EXCEL_FILE_PATH)
@@ -218,6 +218,7 @@ def json_extraction(data, res):
             jsonpath_str_list = jsonpath_str.split(';')
             logger.info("JSON表达式: %s" % jsonpath_str_list)
             # 循环输出列表值
+            temp = {}
             for i in range(length):
                 # 获取JSON提取_引用名称
                 key = json_name_str_list[i]
@@ -226,7 +227,9 @@ def json_extraction(data, res):
                 # 字典值获取
                 value_json = ApiKeyword.get_text(res.text, json_exp)
                 # 持续添加参数，只要参数名不重复，重复的后面就会覆盖前面的参数
-                ALL_VALUE[key] = value_json
+                temp[key] = value_json
+            set_all_value(temp)
+            logger.info(get_all_value())
 
 
 def regular_extraction(data, res):
@@ -253,15 +256,20 @@ def regular_extraction(data, res):
             regular_str_list = regular_str.split(';')
             logger.info("正则表达式: %s" % regular_str_list)
             # 循环输出列表值
+            temp = {}
             for i in range(length):
                 # 获取提取_引用名称
                 key = regular_name_str_list[i]
+                logger.info("引用名称: %s" % key)
                 # 正则表达式获取
                 regular_exp = regular_str_list[i]
                 # 字典值获取
                 value_regular = re.findall(regular_exp, res.text)
-                # 持续添加参数，只要参数名不重复，重复的后面就会覆盖前面的参数
-                ALL_VALUE[key] = None if not value_regular else value_regular
+                # 持续添加参数，只要参数名重复，重复的后面就会覆盖前面的参数
+                logger.info("获取到正则提取结果: %s" % value_regular)
+                temp[key] = value_regular if value_regular else None
+            set_all_value(temp)
+            logger.info(get_all_value())
 
 
 def sql_request(sql_id):
@@ -303,7 +311,7 @@ def sql_request(sql_id):
                     )
                 )
             )
-        ALL_VALUE.update(temp)  # 更新到全局变量
+        set_all_value(temp)  # 更新到全局变量
 
 
 @pytest.fixture()
@@ -321,7 +329,10 @@ def assert_result_check(send):
     assert_types = [i.value for i in AssertType]
     excel_assert_types = str(data["校验类型"]).split(";")  # 校验类型(多个)
     excel_json_assert_fields = data['校验字段'].split(";")  # 校验字段(多个)
-    excel_expected_values = data['预期结果'].split(";")  # 预期结果(多个)
+    if isinstance(data['预期结果'], str) and ";" in data['预期结果']:
+        excel_expected_values = data['预期结果'].split(";")  # 预期结果(多个)
+    else:
+        excel_expected_values = [data['预期结果']]
     if not all([i in assert_types for i in excel_assert_types]):  # 如果校验类型中有不符合的字符
         error_info = "校验类型[ %s ]不正确,可用校验参数: %s " % (excel_assert_types, assert_types)
         logger.error(error_info)  # 日志打印
@@ -343,7 +354,10 @@ def assert_result_check(send):
         #     temp_list.append(eval(i))
         # else:
         #     temp_list.append(i)
-        temp_list.append(eval(i))
+        if isinstance(i, (int, float)):
+            temp_list.append(i)
+        else:
+            temp_list.append(eval(i))
     excel_expected_values = temp_list
     return excel_assert_types, excel_json_assert_fields, excel_expected_values
 
@@ -358,7 +372,7 @@ def test_case(json_extract, regular_extract, send, assert_result_check):
         allure.dynamic.description(data['备注'])
     if data['用例名'] is not None:
         # 动态生成标题
-        allure.dynamic.title(data['用例名'])
+        allure.dynamic.title(str(data['用例名']).replace(" ", "").replace("\n", ""))
     # 数量相等的情况
     # =================预期结果校验=================
     for i in range(len(excel_assert_types)):  # 校验参数类型
@@ -390,7 +404,7 @@ def test_case(json_extract, regular_extract, send, assert_result_check):
                 sql_expected = eval(sql_expected_list[i])
                 # if sql_expected.startswith("{") or sql_expected.startswith("[") or sql_expected == "None":
                 #     sql_expected = eval(sql_expected)
-                val_raw = ALL_VALUE.get(sql_vars_list[i], None)
+                val_raw = get_all_value().get(sql_vars_list[i], None)
                 if val_raw is not None and isinstance(val_raw, (int, decimal.Decimal, datetime.datetime)):
                     val_raw = str(val_raw)
                 if val_raw == sql_expected:
@@ -398,7 +412,7 @@ def test_case(json_extract, regular_extract, send, assert_result_check):
                     excel.save(EXCEL_FILE_PATH)
                 else:
                     error_info = "不通过,数据库校验失败,预期: %s,实际: %s" % (
-                        sql_expected, ALL_VALUE.get(sql_vars_list[i], None))
+                        sql_expected, get_all_value().get(sql_vars_list[i], None))
                     case_sheet["S" + r] = error_info
                     logger.error(error_info)
                     excel.save(EXCEL_FILE_PATH)

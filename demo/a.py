@@ -92,4 +92,6 @@ def setup_b():
 # a = None if not result else result
 # print(a)
 
-print(deepdiff.DeepDiff(1, 1, ignore_string_type_changes=True, ignore_numeric_type_changes=True).pretty())
+# print(deepdiff.DeepDiff(1, 1, ignore_string_type_changes=True, ignore_numeric_type_changes=True).pretty())
+
+print(type(eval("1")))

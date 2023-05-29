@@ -56,10 +56,12 @@ def regular_excel_data(data: dict):
 #
 if __name__ == '__main__':
     # print(get_excel_data())
-    sql_expected_list = []
-    for i in read_excel(TEST_SHEET_NAME)[0]["数据库预期"].split(";"):
-        if i.startswith("{") or i.startswith("[") or i == "None":
-            sql_expected_list.append(eval(i))
-        else:
-            sql_expected_list.append(i)
-    print(sql_expected_list)
+    # sql_expected_list = []
+    # for i in read_excel(TEST_SHEET_NAME)[0]["数据库预期"].split(";"):
+    #     if i.startswith("{") or i.startswith("[") or i == "None":
+    #         sql_expected_list.append(eval(i))
+    #     else:
+    #         sql_expected_list.append(i)
+    # print(sql_expected_list)
+    a = read_excel(TEST_SHEET_NAME)[2]
+    print(a)

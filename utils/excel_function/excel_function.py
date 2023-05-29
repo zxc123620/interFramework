@@ -74,13 +74,13 @@ class ExcelFunction:
         return rsaer.decrypt(content)
 
     @staticmethod
-    def f_int(i):
+    def get_index(raw, i):
         """
-        int转换
+        获取列表中的指定值
         Args:
-            i:
-
+            raw: 查找的列表
+            i: index
         Returns:
 
         """
-        return int(i)
+        return raw[i]
