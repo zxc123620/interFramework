@@ -1,7 +1,7 @@
 import datetime
 import logging
 import logging.handlers
-
+import os
 # 获取项目根路径
 from config import ROOT_PATH
 
@@ -9,7 +9,8 @@ from config import ROOT_PATH
 logger = logging.getLogger('main')
 logger.setLevel(level=logging.DEBUG)
 formatter = logging.Formatter('%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s')
-
+if not os.path.exists(f"{ROOT_PATH}/log/"):
+    os.mkdir(f"{ROOT_PATH}/log/")
 # 初始化日志文件对象
 handler = logging.handlers.TimedRotatingFileHandler(filename=f"{ROOT_PATH}/log/" + str(datetime.date.today()) + ".log", when="D",
                                                     interval=1,
